@@ -1,11 +1,36 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import { Sidebar } from '../Sidebar/Sidebar'
 import { Header } from '../Header/Header'
 import { Footer } from '../Footer/Footer'
 import { Link } from 'react-router-dom'
+import { GetFormApiDealer } from '../Baseurl/baseUrl'
+import moment from 'moment'
 
 const Profile = () => {
+  const [loading, setLoading] = useState(false);
+
+const[data,setData] = useState()
+  useEffect(() => {
+    let fun = async () => {
+      const saveTheData = await GetFormApiDealer(
+        `/self/${localStorage.getItem('userId')}`,
+        setLoading
+      );
+
+      if (saveTheData.error) {
+        setLoading(false);
+        return;
+      }
+      setData(saveTheData.data);
+    };
+
+    fun();
+  }, []);
+
+
+console.log(data);
+
   return (
     <div>
 <Helmet>
@@ -55,11 +80,11 @@ const Profile = () => {
                                 Full Name
                               </span>
                               <span className="profile-ud-value">
-                                Abu Bin Ishtiyak
+                                {data?.fullName}
                               </span>
                             </div>
                           </div>
-                          <div className="profile-ud-item">
+                          {/* <div className="profile-ud-item">
                             <div className="profile-ud wider">
                               <span className="profile-ud-label">
                                 Date of Birth
@@ -67,21 +92,21 @@ const Profile = () => {
                               <span className="profile-ud-value">
                                 10 Aug, 1980
                               </span>
-                            </div>
-                          </div>
-                          <div className="profile-ud-item">
+                            </div> */}
+                          {/* </div> */}
+                          {/* <div className="profile-ud-item">
                             <div className="profile-ud wider">
                               <span className="profile-ud-label">Surname</span>
                               <span className="profile-ud-value">IO</span>
                             </div>
-                          </div>
+                          </div> */}
                           <div className="profile-ud-item">
                             <div className="profile-ud wider">
                               <span className="profile-ud-label">
                                 Mobile Number
                               </span>
                               <span className="profile-ud-value">
-                                01713040400
+                                {data?.phone}
                               </span>
                             </div>
                           </div>
@@ -91,7 +116,7 @@ const Profile = () => {
                                 Email Address
                               </span>
                               <span className="profile-ud-value">
-                                info@softnio.com
+                              {data?.email}
                               </span>
                             </div>
                           </div>
@@ -113,7 +138,7 @@ const Profile = () => {
                                 Joining Date
                               </span>
                               <span className="profile-ud-value">
-                                09-15-2021 09:04PM
+                                {moment(data?.createdAt).format('MMMM Do YYYY')}
                               </span>
                             </div>
                           </div>
@@ -127,19 +152,19 @@ const Profile = () => {
                           </div>
                           <div className="profile-ud-item">
                             <div className="profile-ud wider">
-                              <span className="profile-ud-label">Country</span>
+                              <span className="profile-ud-label">Pincode</span>
                               <span className="profile-ud-value">
-                                United State
-                              </span>
+                              {data?.pinCode}
+                                                          </span>
                             </div>
                           </div>
                           <div className="profile-ud-item">
                             <div className="profile-ud wider">
                               <span className="profile-ud-label">
-                                Nationality
+                                Address
                               </span>
                               <span className="profile-ud-value">
-                                United State
+                              {data?.address}
                               </span>
                             </div>
                           </div>
@@ -164,7 +189,7 @@ const Profile = () => {
                                 pharetra.{" "}
                               </p>
                             </div>
-                            <div className="bq-note-meta">
+                            {/* <div className="bq-note-meta">
                               <span className="bq-note-added">
                                 Added on{" "}
                                 <span className="date">September 15, 2021</span>{" "}
@@ -177,8 +202,8 @@ const Profile = () => {
                               <a href="#" className="link link-sm link-danger">
                                 Hide Note
                               </a>
-                            </div>
-                          </div>
+                            </div>*/}
+                          </div> 
                           {/* .bq-note-item */}
                         </div>
                         {/* .bq-note */}
@@ -200,9 +225,9 @@ const Profile = () => {
                             <span>AB</span>
                           </div>
                           <div className="user-info">
-                            <span className="lead-text">Sahil Choudhury</span>
+                            <span className="lead-text">{data?.fullName}</span>
                             <span className="sub-text">
-                              choudhury123sahil@gmail.com
+                            {data?.email}
                             </span>
                           </div>
                           {/* <div className="user-action">
@@ -236,7 +261,7 @@ const Profile = () => {
                         {/* .user-card */}
                       </div>
                       {/* .card-inner */}
-                      <div className="card-inner">
+                      {/* <div className="card-inner">
                         <div className="user-account-info py-0">
                           <h6 className="overline-title-alt">
                             Available Points
@@ -247,7 +272,7 @@ const Profile = () => {
                           </div>
                           <div className="user-account-label"></div>
                         </div>
-                      </div>
+                      </div> */}
                       {/* .card-inner */}
                       <div className="card-inner p-0">
                         <ul className="link-list-menu">

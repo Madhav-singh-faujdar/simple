@@ -62,16 +62,18 @@ const nav = useNavigate()
 
       const formData = { email, password }
 
-      const data = await PostFormApi(`${BASE_URL_AUTH}/login`, setLoading, formData, toastId)
+      const data = await PostFormApi(`/login`, setLoading, formData, toastId)
       if (data.error) {
         setLoading(false)
         return
       }
-      // console.log(data);
-      await window.localStorage.setItem("token", data.data.accessToken)
-      await window.localStorage.setItem("expirationTime", data.data.accessTokenExpiresIn)
-      await window.localStorage.setItem("userId", data.data.userId)
-      await window.localStorage.setItem("isLoggedIn", data.data.isLoggedIn)
+      console.log(data);
+      await window.localStorage.setItem("token", data?.data.accessToken)
+      await window.localStorage.setItem("expirationTime", data?.data.accessTokenExpiresIn)
+      await window.localStorage.setItem("userId", data?.data.userId)
+      await window.localStorage.setItem("isLoggedIn", true)
+      await window.localStorage.setItem("email", data?.data.email)
+      await window.localStorage.setItem("name", data?.data.name)
       await setLoading(false)
       await setEmail('')
       await setPassword('')
@@ -149,9 +151,9 @@ const nav = useNavigate()
                     <label className="form-label" htmlFor="password">
                       Password
                     </label>
-                    <Link className="link link-primary link-sm" to="/Reset">
+                    {/* <Link className="link link-primary link-sm" to="/Reset">
                       Forgot Password?
-                    </Link>
+                    </Link> */}
                   </div>
                   <div className="form-control-wrap">
                     <Link

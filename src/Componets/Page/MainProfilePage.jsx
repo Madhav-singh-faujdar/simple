@@ -1,10 +1,39 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Footer } from '../Footer/Footer'
 import { Header } from '../Header/Header'
 import { Sidebar } from '../Sidebar/Sidebar'
 import { Link } from 'react-router-dom'
+import { GetFormApiDealer } from '../Baseurl/baseUrl'
 
 export const MainProfilePage = () => {
+
+
+  const [loading, setLoading] = useState(false);
+
+  const [dealer, setDealer] = useState([]);
+
+ useEffect(() => {
+    let fun = async () => {
+      const saveTheData = await GetFormApiDealer(
+        "/getBill",
+        setLoading
+      );
+
+      if (saveTheData.error) {
+        setLoading(false);
+        return;
+      }
+      setDealer(saveTheData.data);
+    };
+
+    fun();
+  }, []);
+
+
+
+
+
+
   return (
 <div className="nk-app-root">
   {/* main @s */}
@@ -23,7 +52,7 @@ export const MainProfilePage = () => {
               </div>
               <div className="nk-block-between-md g-4">
                 <div className="nk-block-head-content">
-                  <h2 className="nk-block-title fw-normal">Sahil Choudhury</h2>
+                  <h2 className="nk-block-title fw-normal">{localStorage.getItem('name')}</h2>
                   <div className="nk-block-des">
                     <p>At a glance summary of your account. Have fun!</p>
                   </div>
@@ -80,9 +109,9 @@ export const MainProfilePage = () => {
                             </th>
                             <th className="tb-tnx-amount is-alt">
                               <span className="tb-tnx-total">Amount</span>
-                              <span className="tb-tnx-status d-none d-md-inline-block">
-                                Status
-                              </span>
+                              {/* <span className="tb-tnx-status d-none d-md-inline-block">
+                                Amount
+                              </span> */}
                             </th>
                             <th className="tb-tnx-action">
                               <span> Invoice</span>
@@ -91,34 +120,53 @@ export const MainProfilePage = () => {
                           {/* tb-tnx-item */}
                         </thead>
                         <tbody>
-                          <tr className="tb-tnx-item">
-                            <td className="tb-tnx-id">
-                                <span>4947</span>
-                            </td>
-                            <td className="tb-tnx-info">
-                              <div className="tb-tnx-desc">
-                                <span className="title">Distributer 1</span>
-                              </div>
-                              <div className="tb-tnx-date">
-                                <span className="date">10-05-2023</span>
-                              </div>
-                            </td>
-                            <td className="tb-tnx-amount is-alt">
-                              <div className="tb-tnx-total">
-                                <span>₹2599.00</span>
-                              </div>
-                              <div className="tb-tnx-status">
-                                <span className="badge badge-dot text-warning">
-                                  Pending
-                                </span>
-                              </div>
-                            </td>
-                            <td className="tb-tnx-action">
-                              <Link href="#">
-                                <span>View</span>
-                              </Link>
-                            </td>
-                          </tr>
+
+
+
+
+
+
+
+                        {
+
+loading ? "Please Wait...."  :
+
+
+(dealer || []).map((v)=>(
+
+                        <tr className="tb-tnx-item">
+                          <td className="tb-tnx-id">
+                            <a href="#">
+                              <span>{v._id}</span>
+                            </a>
+                          </td>
+                          <td className="tb-tnx-info">
+                            <div className="tb-tnx-desc">
+                              <span className="date">{v.distributor.userName}</span>
+                            </div>
+                            <div className="tb-tnx-date">
+                              <span className="title">{v.invoiceDate}</span>
+                            </div>
+                          </td>
+                          <td className="tb-tnx-amount is-alt">
+                            <div className="tb-tnx-total">
+                            <span >{v.invoiceAmount}</span>
+                            </div>
+                            {/* <div className="tb-tnx-status">
+                              <span className="badge badge-dot text-warning">
+                                Pending
+                              </span>
+                            </div> */}
+                          </td>
+                          <td className="tb-tnx-action">
+                            <a href={v.uploadedBill} target='_blank'>
+                              <span>View</span>
+                            </a>
+                          </td>
+                        </tr>
+))
+
+}
                           
                         </tbody>
                       </table>
@@ -382,14 +430,14 @@ export const MainProfilePage = () => {
                             </p>
                           </div>
                         </div>
-                        <div className="nk-block-content flex-shrink-0">
+                        {/* <div className="nk-block-content flex-shrink-0">
                           <Link
                             href="#"
                             className="btn btn-lg btn-outline-primary"
                           >
                             Get Support Now
                           </Link>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                     {/* .card-inner */}

@@ -1,10 +1,160 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Footer } from '../Footer/Footer'
 import { Header } from '../Header/Header'
 import { Sidebar } from '../Sidebar/Sidebar'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { GetFormApiDealer, PostFormApi } from '../Baseurl/baseUrl'
 
 export const AvaliblePoint = () => {
+
+  const [dealer, setDealer] = useState([]);
+
+ useEffect(() => {
+    let fun = async () => {
+      const saveTheData = await GetFormApiDealer(
+        "/getAuthenticUser",
+        setLoading
+      );
+
+      if (saveTheData.error) {
+        setLoading(false);
+        return;
+      }
+      setDealer(saveTheData.data);
+    };
+
+    fun();
+  }, []);
+
+
+
+
+
+
+
+
+
+  const [loading, setLoading] = useState(false);
+const nav = useNavigate()
+  const [formData, setFormData] = useState({
+    invoiceNumber: '',
+    uploadInvoice: null,
+    checkbox: false,
+    invoiceDate:'',
+    invoiceAmount:'',
+    distributor:''
+  });
+console.log(formData);
+  const handleChange = (e) => {
+    const { id, type, checked } = e.target;
+  
+    if (type === 'file') {
+      const file = e.target.files[0]; // Get the selected file
+      setFormData((prevData) => ({
+        ...prevData,
+        [id]: file,
+      }));
+  
+      // If you need to read the file content, you can use FileReader
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Do something with the file content, for example:
+        // console.log(reader.result);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [id]: type === 'checkbox' ? checked : e.target.value,
+      }));
+    }
+  };
+  
+  const hndl = async (image) => {
+    try {
+      const URL = "6bc0752cef68cc0aaa0f6d26e5186ddb";
+
+      const formData_img = new FormData();
+      formData_img.append("image", image);
+      const url = `https://api.imgbb.com/1/upload?key=${URL}`;
+
+      const data = await fetch(url, {
+        method: "POST",
+        body: formData_img,
+      });
+      const ImageData = await data.json();
+      if (!data.ok) {
+        throw new Error(data.message);
+      }
+
+      return ImageData.data.url;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    if (!formData.invoiceNumber || !formData.checkbox || !formData?.invoiceDate || !formData?.invoiceAmount ||!formData.uploadInvoice  || !formData.distributor) {
+      toast.error('Please fill in all required fields.');
+      return;
+    }
+
+try {
+
+  const imgBB = await hndl(formData.uploadInvoice);
+
+if (!imgBB) {
+  toast.error('Please provide a valid image');
+      return;
+}
+
+
+
+let SIGNUP_DATA = { uploadedBill:imgBB, billNumber:formData.invoiceNumber, userID:localStorage.getItem('userId'),invoiceDate:formData?.invoiceDate,
+invoiceAmount:formData?.invoiceAmount , distributor:formData?.distributor}
+
+  const toastId = toast.loading("Loading...");
+
+        setLoading(true);
+
+        const saveTheData = await PostFormApi(
+          "/addBill",
+          setLoading,
+          SIGNUP_DATA,
+          toastId
+        );
+
+        if (saveTheData.error) {
+          setLoading(false);
+          return;
+        }
+
+        setFormData({
+          invoiceNumber: '',
+          uploadInvoice: '',
+          checkbox: false,
+          invoiceDate:'',
+          invoiceAmount:'',
+        })
+
+
+        nav('/Points-Success')
+
+} catch (error) {
+  toast.error(error)
+  setLoading(false)
+}
+
+  
+  }
+
+
   return (
 <div className="nk-app-root">
   {/* main @s */}
@@ -35,141 +185,145 @@ export const AvaliblePoint = () => {
             <div className="nk-block">
               <div className="card card-bordered card-stretch">
                 <div className="card-inner">
-                  <form action="index.html">
+                  <form onSubmit={handleSubmit}>
                     <div className="row g-gs">
                       <div className="col-md-6">
-                        <div className="form-group">
-                          <label className="form-label" htmlFor="invoice-date">
-                            Invoice Date
-                          </label>
-                          <div className="form-control-wrap">
-                            <div className="form-icon form-icon-left">
-                              <em className="icon ni ni-calendar" />
+                      <div className="form-group">
+                              <label className="form-label" htmlFor="invoice-date">
+                                Invoice Number
+                              </label>
+                              <div className="form-control-wrap">
+                                <input
+                                  type="text"
+                                  id="invoiceNumber"
+                                  className="form-control"
+                                  placeholder="Fill the invoice number"
+                                  required=""
+                                  value={formData.invoiceNumber}
+                                  onChange={handleChange}
+                                />
+                              </div>
                             </div>
-                            <input
-                              type="text"
-                              id="birth-date"
-                              className="form-control date-picker"
-                              placeholder="mm/dd/yyyy"
-                              data-date-format="mm/dd/yyyy"
-                              required=""
-                            />
                           </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="form-group">
-                          <label className="form-label">
-                            Distributer Name{" "}
-                          </label>
-                          <div className="form-control-wrap">
-                            <select className="form-select js-select2">
-                              <option value="Distributer-1">
-                                Distributer 1
-                              </option>
-                              <option value="Distributer-2">
-                                Distributer 2{" "}
-                              </option>
-                              <option value="Distributer-3">
-                                Distributer 3{" "}
-                              </option>
-                              <option value="Distributer-4">
-                                Distributer 4
-                              </option>
-                              <option value="Distributer-5">
-                                Distributer 5
-                              </option>
-                              <option value="Distributer-6">
-                                Distributer 6
-                              </option>
-                              <option value="Distributer-7">
-                                Distributer 7
-                              </option>
-                              <option value="Distributer-8">
-                                Distributer 8
-                              </option>
-                              <option value="Distributer-9">
-                                Distributer 9
-                              </option>
-                            </select>
+                          <div className="col-md-6">
+                      <div className="form-group">
+                              <label className="form-label" htmlFor="invoice-date">
+                                Invoice Date
+                              </label>
+                              <div className="form-control-wrap">
+                                <input
+                                  type="date"
+                                  id="invoiceDate"
+                                  className="form-control"
+                                  placeholder=""
+                                  required=""
+                                  value={formData.invoiceDate}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="form-group">
-                          <label
-                            className="form-label"
-                            htmlFor="invoice-amount"
-                          >
-                            Invoice Amount
-                          </label>
-                          <div className="form-control-wrap">
-                            <input
-                              type="number"
-                              className="form-control"
-                              id="invoive-amount"
-                              placeholder="Enter Amount"
-                              required=""
-                            />
+                          <div className="col-md-6">
+                      <div className="form-group">
+                              <label className="form-label" htmlFor="invoice-date">
+                                Invoice Amount
+                              </label>
+                              <div className="form-control-wrap">
+                                <input
+                                  type="number"
+                                  id="invoiceAmount"
+                                  className="form-control"
+                                  placeholder="Fill the amount"
+                                  required=""
+                                  value={formData.invoiceAmount}
+                                  onChange={handleChange}
+                                />
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="col-md-6">
-                        <div className="form-group">
-                          <label className="form-label" htmlFor="aadhar-card">
-                            Upload Invoive or Bill
-                          </label>
-                          <div className="form-control-wrap">
-                            <div className="form-file">
-                              <input
-                                type="file"
-                                className="form-file-input"
-                                id="upload-invoice"
-                              />
-                              <label
-                                className="form-file-label"
-                                htmlFor="invoice"
+
+
+                          <div className="col-md-6">
+                          <div className="form-group">
+                            <label className="form-label">
+                              Select Preferred Distributor
+                            </label>
+                            <div className="form-control-wrap">
+                              <select
+                                id="distributor"
+                                value={formData.distributor}
+                                onChange={handleChange}
                               >
-                                Choose file
+                                <option value="">Select a Distributor</option>
+
+                                {(dealer || []).map((v) => (
+                                  <option key={v._id} value={v._id}>
+                                    {v.userName}
+                                  </option>
+                                ))}
+                              </select>
+
+                              
+                            </div>
+                          </div>
+                        </div>
+
+
+
+
+
+
+
+                          <div className="col-md-6">
+                            <div className="form-group">
+                              <label className="form-label" htmlFor="aadhar-card">
+                                Upload Invoice or Bill
+                              </label>
+                              <div className="form-control-wrap">
+                                <div className="form-file">
+                                  <input
+                                    type="file"
+                                    className="form-file-input"
+                                    id="uploadInvoice"
+                                    onChange={handleChange}
+                                  />
+                                  <label className="form-file-label" htmlFor="invoice">
+                                    Choose file
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="col-12">
+                            <div className="custom-control custom-control-sm custom-checkbox">
+                              <input
+                                type="checkbox"
+                                className="custom-control-input"
+                                id="checkbox"
+                                checked={formData.checkbox}
+                                onChange={handleChange}
+                              />
+                              <label className="custom-control-label" htmlFor="checkbox">
+                                <p>
+                                  I do hereby admit that all the above information that I have input is true &amp; correct.
+                                  <br />
+                                  If any of the above information figured out false or incorrect, I understand &amp; agree that my incentive will not be approved.
+                                </p>
                               </label>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                      <div className="col-12">
-                        <div className="custom-control custom-control-sm custom-checkbox">
-                          <input
-                            type="checkbox"
-                            className="custom-control-input"
-                            defaultChecked=""
-                            id="note"
-                          />
-                          <label
-                            className="custom-control-label"
-                            htmlFor="note"
-                          >
-                            <p>
-                              I do hereby admit that all the above information
-                              that I have input is true &amp; correct.
-                              <br />
-                              If any of the above information figured out false
-                              or incorrect, I understand &amp; agree that my
-                              incentive will not be approved.
-                            </p>
-                          </label>
-                        </div>
-                      </div>
-                      <div className="col-12">
-                        <ul className="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
-                          <li>
-                            <a
-                              href="avail-points-success.html"
-                              data-dismiss="modal"
-                              className="btn btn-lg btn-primary"
-                            >
-                              Submit
-                            </a>
-                          </li>
+                          <div className="col-12">
+                            <ul className="align-center flex-wrap flex-sm-nowrap gx-4 gy-2">
+                              <li>
+
+                                {
+
+loading ? "":
+                                <button type="submit" className="btn btn-lg btn-primary">
+                                  Submit
+                                </button>
+                                }
+                              </li>
                         </ul>
                       </div>
                     </div>
@@ -366,11 +520,11 @@ export const AvaliblePoint = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="nk-block-content flex-shrink-0">
+                    {/* <div className="nk-block-content flex-shrink-0">
                       <Link to="#" className="btn btn-lg btn-outline-primary">
                         Get Support Now
                       </Link>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
                 {/* .card-inner */}
@@ -389,4 +543,4 @@ export const AvaliblePoint = () => {
   {/* main @e */}
 </div>
   )
-}
+                  }

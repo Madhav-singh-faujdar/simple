@@ -1,9 +1,39 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Footer } from '../Footer/Footer'
 import { Header } from '../Header/Header'
 import { Sidebar } from '../Sidebar/Sidebar'
+import { GetFormApiDealer } from '../Baseurl/baseUrl'
 
 export const PointsHistory = () => {
+
+
+
+  const [loading, setLoading] = useState(false);
+
+  const [dealer, setDealer] = useState([]);
+
+ useEffect(() => {
+    let fun = async () => {
+      const saveTheData = await GetFormApiDealer(
+        "/getBill",
+        setLoading
+      );
+
+      if (saveTheData.error) {
+        setLoading(false);
+        return;
+      }
+      setDealer(saveTheData.data);
+    };
+
+    fun();
+  }, []);
+
+
+
+
+
+
   return (
 <div className="nk-app-root">
   {/* main @s */}
@@ -47,7 +77,7 @@ export const PointsHistory = () => {
             <div className="nk-block">
               <div className="card card-bordered card-stretch">
                 <div className="card-inner-group">
-                  <div className="card-inner position-relative card-tools-toggle">
+                  {/* <div className="card-inner position-relative card-tools-toggle">
                     <div className="card-title-group">
                       <div className="card-tools me-n1">
                         <ul className="btn-toolbar gx-1">
@@ -60,9 +90,7 @@ export const PointsHistory = () => {
                               <em className="icon ni ni-search" />
                             </a>
                           </li>
-                          {/* li */}
                           <li className="btn-toolbar-sep" />
-                          {/* li */}
                           <li>
                             <div className="toggle-wrap">
                               <a
@@ -86,7 +114,6 @@ export const PointsHistory = () => {
                                       <em className="icon ni ni-arrow-left" />
                                     </a>
                                   </li>
-                                  {/* li */}
                                   <li>
                                     <div className="dropdown">
                                       <a
@@ -124,23 +151,14 @@ export const PointsHistory = () => {
                                         </ul>
                                       </div>
                                     </div>
-                                    {/* .dropdown */}
                                   </li>
-                                  {/* li */}
                                 </ul>
-                                {/* .btn-toolbar */}
                               </div>
-                              {/* .toggle-content */}
                             </div>
-                            {/* .toggle-wrap */}
                           </li>
-                          {/* li */}
                         </ul>
-                        {/* .btn-toolbar */}
                       </div>
-                      {/* .card-tools */}
                     </div>
-                    {/* .card-title-group */}
                     <div
                       className="card-search search-wrap"
                       data-search="search"
@@ -165,9 +183,7 @@ export const PointsHistory = () => {
                         </div>
                       </div>
                     </div>
-                    {/* .card-search */}
-                  </div>
-                  {/* .card-inner */}
+                  </div> */}
                   <div className="card-inner p-0">
                     <table className="table table-tranx">
                       <thead>
@@ -180,7 +196,7 @@ export const PointsHistory = () => {
                               <span>Distributer Name</span>
                             </span>
                             <span className="tb-tnx-date d-md-inline-block d-none">
-                              <span className="d-md-none">Date</span>
+                              {/* <span className="d-md-none">Date</span> */}
                               <span className="d-none d-md-block">
                                 <span>Inoice Date</span>
                               </span>
@@ -188,9 +204,9 @@ export const PointsHistory = () => {
                           </th>
                           <th className="tb-tnx-amount is-alt">
                             <span className="tb-tnx-total">Amount</span>
-                            <span className="tb-tnx-status d-none d-md-inline-block">
+                            {/* <span className="tb-tnx-status d-none d-md-inline-block">
                               Status
-                            </span>
+                            </span> */}
                           </th>
                           <th className="tb-tnx-action">
                             <span> Invoice</span>
@@ -199,130 +215,50 @@ export const PointsHistory = () => {
                         {/* tb-tnx-item */}
                       </thead>
                       <tbody>
+
+{
+
+loading ? "Please Wait...."  :
+
+
+(dealer || []).map((v)=>(
+
                         <tr className="tb-tnx-item">
                           <td className="tb-tnx-id">
                             <a href="#">
-                              <span>4947</span>
+                              <span>{v._id}</span>
                             </a>
                           </td>
                           <td className="tb-tnx-info">
                             <div className="tb-tnx-desc">
-                              <span className="title">Distributer 1</span>
+                              <span className="date">{v.distributor.userName}</span>
                             </div>
                             <div className="tb-tnx-date">
-                              <span className="date">10-05-2023</span>
+                              <span className="title">{v.invoiceDate}</span>
                             </div>
                           </td>
                           <td className="tb-tnx-amount is-alt">
                             <div className="tb-tnx-total">
-                              <span>₹2599.00</span>
+                            <span >{v.invoiceAmount}</span>
                             </div>
-                            <div className="tb-tnx-status">
+                            {/* <div className="tb-tnx-status">
                               <span className="badge badge-dot text-warning">
                                 Pending
                               </span>
-                            </div>
+                            </div> */}
                           </td>
                           <td className="tb-tnx-action">
-                            <a href="#">
+                            <a href={v.uploadedBill} target='_blank'>
                               <span>View</span>
                             </a>
                           </td>
                         </tr>
-                        {/* tb-tnx-item */}
-                        <tr className="tb-tnx-item">
-                          <td className="tb-tnx-id">
-                            <a href="#">
-                              <span>4947</span>
-                            </a>
-                          </td>
-                          <td className="tb-tnx-info">
-                            <div className="tb-tnx-desc">
-                              <span className="title">Distributer 1</span>
-                            </div>
-                            <div className="tb-tnx-date">
-                              <span className="date">10-05-2023</span>
-                            </div>
-                          </td>
-                          <td className="tb-tnx-amount is-alt">
-                            <div className="tb-tnx-total">
-                              <span>₹2599.00</span>
-                            </div>
-                            <div className="tb-tnx-status">
-                              <span className="badge badge-dot text-warning">
-                                Pending
-                              </span>
-                            </div>
-                          </td>
-                          <td className="tb-tnx-action">
-                            <a href="#">
-                              <span>View</span>
-                            </a>
-                          </td>
-                        </tr>
-                        {/* tb-tnx-item */}
-                        <tr className="tb-tnx-item">
-                          <td className="tb-tnx-id">
-                            <a href="#">
-                              <span>4947</span>
-                            </a>
-                          </td>
-                          <td className="tb-tnx-info">
-                            <div className="tb-tnx-desc">
-                              <span className="title">Distributer 1</span>
-                            </div>
-                            <div className="tb-tnx-date">
-                              <span className="date">10-05-2023</span>
-                            </div>
-                          </td>
-                          <td className="tb-tnx-amount is-alt">
-                            <div className="tb-tnx-total">
-                              <span>₹2599.00</span>
-                            </div>
-                            <div className="tb-tnx-status">
-                              <span className="badge badge-dot text-success">
-                                Approved
-                              </span>
-                            </div>
-                          </td>
-                          <td className="tb-tnx-action">
-                            <a href="#">
-                              <span>View</span>
-                            </a>
-                          </td>
-                        </tr>
-                        {/* tb-tnx-item */}
-                        <tr className="tb-tnx-item">
-                          <td className="tb-tnx-id">
-                            <a href="#">
-                              <span>4947</span>
-                            </a>
-                          </td>
-                          <td className="tb-tnx-info">
-                            <div className="tb-tnx-desc">
-                              <span className="title">Distributer 1</span>
-                            </div>
-                            <div className="tb-tnx-date">
-                              <span className="date">10-05-2023</span>
-                            </div>
-                          </td>
-                          <td className="tb-tnx-amount is-alt">
-                            <div className="tb-tnx-total">
-                              <span>₹2599.00</span>
-                            </div>
-                            <div className="tb-tnx-status">
-                              <span className="badge badge-dot text-success">
-                                Approved
-                              </span>
-                            </div>
-                          </td>
-                          <td className="tb-tnx-action">
-                            <a href="#">
-                              <span>View</span>
-                            </a>
-                          </td>
-                        </tr>
-                        {/* tb-tnx-item */}
+))
+
+}
+
+
+                        
                       </tbody>
                     </table>
                   </div>

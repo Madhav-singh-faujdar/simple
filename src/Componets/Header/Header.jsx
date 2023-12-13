@@ -71,7 +71,7 @@ let hndlSignOut = ()=>{
                   </div>
                   <div className="user-info d-none d-md-block">
                     <div className="user-name dropdown-indicator">
-                      Sahil Choudhury
+                      {localStorage.getItem('name')}
                     </div>
                   </div>
                 </div>
@@ -83,14 +83,14 @@ let hndlSignOut = ()=>{
                       <span>SC</span>
                     </div>
                     <div className="user-info">
-                      <span className="lead-text">Sahil Choudhury</span>
+                      <span className="lead-text">{localStorage.getItem('name')}</span>
                       <span className="sub-text">
-                        choudhury123sahil@gmail.com
+                      {localStorage.getItem('email')}
                       </span>
                     </div>
                   </div>
                 </div>
-                <div className="dropdown-inner user-account-info">
+                {/* <div className="dropdown-inner user-account-info">
                   <h6 className="overline-title-alt">Available Points</h6>
                   <div className="user-balance">
                     2500.63{" "}
@@ -100,7 +100,7 @@ let hndlSignOut = ()=>{
                     <span>Avail Points </span>{" "}
                     <em className="icon ni ni-wallet-in" />
                   </Link>
-                </div>
+                </div> */}
                 <div className="dropdown-inner">
                   <ul className="link-list">
                     <li>

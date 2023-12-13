@@ -1,27 +1,50 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { GetFormApiDealer, PostFormApi } from "../Baseurl/baseUrl";
+import toast from "react-hot-toast";
 
 const Register = () => {
+  const [loading, setLoading] = useState(false);
+  const [dealer, setDealer] = useState([]);
+  // State to hold form errors
+  const [errors, setErrors] = useState({});
+  const nav = useNavigate();
+
+  useEffect(() => {
+    let fun = async () => {
+      const saveTheData = await GetFormApiDealer(
+        "/getAuthenticUser",
+        setLoading
+      );
+
+      if (saveTheData.error) {
+        setLoading(false);
+        return;
+      }
+      setDealer(saveTheData.data);
+    };
+
+    fun();
+  }, []);
+
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
     email: "",
     distributor: "",
+
     aadhar: null,
+
     address: "",
     pincode: "",
     password: "",
     checkbox: false,
   });
 
-  // State to hold form errors
-  const [errors, setErrors] = useState({});
-
   // Handle form field changes
   const handleChange = (e) => {
     const { id, value } = e.target;
-    console.log(value);
     setFormData((prevData) => ({
       ...prevData,
       [id]: value,
@@ -37,18 +60,79 @@ const Register = () => {
     }));
   };
 
+  const hndl = async (image) => {
+    try {
+      const URL = "6bc0752cef68cc0aaa0f6d26e5186ddb";
+
+      const formData_img = new FormData();
+      formData_img.append("image", image);
+      const url = `https://api.imgbb.com/1/upload?key=${URL}`;
+
+      const data = await fetch(url, {
+        method: "POST",
+        body: formData_img,
+      });
+      const ImageData = await data.json();
+      if (!data.ok) {
+        throw new Error(data.message);
+      }
+
+      return ImageData.data.url;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Validate form data
-    const validationErrors = validateFormData(formData);
-    setErrors(validationErrors);
-    if (Object.keys(validationErrors).length === 0) {
-      // Form data is valid, proceed with submission
-      console.log("Form data:", formData);
-    } else {
-      // Form data is not valid, display errors
-      console.log("Form data validation failed:", validationErrors);
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      // Validate form data
+      const validationErrors = validateFormData(formData);
+      setErrors(validationErrors);
+      if (Object.keys(validationErrors).length === 0) {
+        // Form data is valid, proceed with submission
+
+
+        const imgBB = await hndl(formData.aadhar);
+
+        let SIGNUP_DATA = {
+          fullName: formData.name,
+          email: formData.email,
+          password: formData.password,
+          phone: Number(formData.mobile),
+          delearId: formData.distributor,
+          pinCode: formData.pincode,
+          address: formData.address,
+          file: imgBB,
+        };
+
+        const toastId = toast.loading("Loading...");
+
+        setLoading(true);
+
+        const saveTheData = await PostFormApi(
+          "/signup",
+          setLoading,
+          SIGNUP_DATA,
+          toastId
+        );
+
+        if (saveTheData.error) {
+          setLoading(false);
+          return;
+        }
+
+        localStorage.setItem('userId',saveTheData.data)
+
+        nav("/otp-registration");
+      } else {
+        setLoading(false);
+        throw new Error("Form data validation failed:" + validationErrors);
+      }
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
     }
   };
 
@@ -219,13 +303,14 @@ const Register = () => {
                                 onChange={handleChange}
                               >
                                 <option value="">Select a Distributor</option>
-                                <option value="Distributor-1">
-                                  Distributor 1
-                                </option>
-                                <option value="Distributor-2">
-                                  Distributor 2
-                                </option>
+
+                                {(dealer || []).map((v) => (
+                                  <option key={v._id} value={v._id}>
+                                    {v.userName}
+                                  </option>
+                                ))}
                               </select>
+
                               {errors.distributor && (
                                 <div className="invalid-feedback">
                                   {errors.distributor}
@@ -369,7 +454,7 @@ const Register = () => {
                               I agree to SATO <Link to="#">Privacy Policy</Link>{" "}
                               &amp; <Link to="#"> Terms.</Link>
                             </label>
-                            <br/>
+                            <br />
                             {errors.checkbox && (
                               <div className="invalid-feedback">
                                 {errors.checkbox}
@@ -379,9 +464,13 @@ const Register = () => {
                         </div>
 
                         <div className="form-group">
-                          <button className="btn btn-lg btn-primary btn-block">
-                            Register
-                          </button>
+                          {loading ? (
+                            ""
+                          ) : (
+                            <button className="btn btn-lg btn-primary btn-block">
+                              Register
+                            </button>
+                          )}
                         </div>
                       </div>
                     </form>

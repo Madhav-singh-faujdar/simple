@@ -1,8 +1,86 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Helmet } from 'react-helmet'
-import { Link } from 'react-router-dom'
+import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom'
+import { PostFormApi } from '../Baseurl/baseUrl';
 
 export const OtpVerify = () => {
+
+  const [loading, setLoading] = useState(false);
+const nav = useNavigate()
+
+  const [otp, setOtp] = useState('');
+
+  const handleSubmit = async(event) => {
+    event.preventDefault();
+
+
+
+try {
+  
+  if (otp.length !== 6) {
+    toast.error('Invalid OTP length. Please enter a 6-digit OTP.');
+    return
+  }
+
+
+  if (loading) {
+    return
+  }
+  setLoading(true)
+
+  const toastId = toast.loading('Loading...');
+
+
+  const formData = { userId:localStorage.getItem('userId'), otp }
+
+  const data = await PostFormApi(`/verifyOtp`, setLoading, formData, toastId)
+  if (data.error) {
+    setLoading(false)
+    return
+  }
+  nav('/signup-done')
+
+} catch (error) {
+  
+toast.error(error)
+
+}
+
+  };
+
+  const handleChange = (event) => {
+    setOtp(event.target.value);
+  };
+
+
+
+const hndlOtp = async()=>{
+try {
+  
+  if (loading) {
+    return
+  }
+  setLoading(true)
+
+  const toastId = toast.loading('Loading...');
+
+
+  const formData = { userId:localStorage.getItem('userId') }
+
+  const data = await PostFormApi(`/resendPhoneOtp`, setLoading, formData, toastId)
+  if (data.error) {
+    setLoading(false)
+    return
+  }
+} catch (error) {
+  toast.error(error)
+}
+}
+
+
+
+
   return (
     <div>
 
@@ -39,7 +117,7 @@ export const OtpVerify = () => {
                   </div>
                 </div>
               </div>
-              <form action="success.html">
+              <form onSubmit={handleSubmit}>
                 <div className="form-group">
                   <div className="form-label-group">
                     <label className="form-label" htmlFor="default-01">
@@ -47,12 +125,14 @@ export const OtpVerify = () => {
                     </label>
                   </div>
                   <div className="form-control-wrap">
-                    <input
-                      type="number"
-                      className="form-control form-control-lg"
-                      id="default-01"
-                      placeholder="######"
-                    />
+                  <input
+                type="number"
+                className="form-control form-control-lg"
+                id="default-01"
+                placeholder="######"
+                value={otp}
+                onChange={handleChange}
+              />
                   </div>
                 </div>
                 <div className="form-group">
@@ -61,9 +141,9 @@ export const OtpVerify = () => {
                   </button>
                 </div>
               </form>
-              <div className="form-note-s2 text-center pt-4">
+              <div className="form-note-s2 text-center pt-4" onClick={hndlOtp} style={{cursor:"pointer"}}  >
                {/* <Link href="/Resend"> */}
-                  <strong>Resend Otp </strong>
+                  <strong  >Resend Otp </strong>
                 {/* </Link> */}
               </div>
             </div>

@@ -102,9 +102,9 @@ let hndlSignOut = ()=>{
                     <span>SC</span>
                   </div>
                   <div className="user-info">
-                    <span className="lead-text">Sahil Choudhury</span>
+                    <span className="lead-text">{localStorage.getItem('name')}</span>
                     <span className="sub-text">
-                      choudhury123sahil@gmail.com
+                    {localStorage.getItem('email')}
                     </span>
                   </div>
                   <div className="user-action">

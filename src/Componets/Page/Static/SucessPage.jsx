@@ -19,7 +19,7 @@ export const SucessPage = () => {
       <div className="nk-content ">
         <div className="nk-block nk-block-middle nk-auth-body">
           <div className="brand-logo pb-5">
-            <Link href="/dashborad" className="logo-link">
+            <Link to="/dashborad" className="logo-link">
               <img
                 className="logo-dark logo-img logo-img-lg"
                 src="assets/images/logo-dark.png"
@@ -37,7 +37,7 @@ export const SucessPage = () => {
                 <div className="nk-block-head-content">
                   <ul className="nk-block-tools gx-3">
                     <li>
-                      <Link href="/" className="btn btn-primary">
+                      <Link to="/" className="btn btn-primary">
                         <span>Login</span>{" "}
                         <em className="icon ni ni-arrow-long-right" />
                       </Link>
